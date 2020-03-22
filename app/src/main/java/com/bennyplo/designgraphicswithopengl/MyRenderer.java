@@ -14,12 +14,28 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private final float[] mViewMatrix = new float[16];//view matrix
     private final float[] mMVMatrix=new float[16];//model view matrix
     private final float[] mModelMatrix=new float[16];//model  matrix
-    private CharacterA mcharA;
+    private CharacterBase mAllChar[];
+
+    private float totalWidth = 0;
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color to black
         GLES32.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        mcharA=new CharacterA();
+
+        mAllChar = new CharacterBase[8];
+        mAllChar[0]=new CharacterI();
+        mAllChar[1]=new CharacterM();
+        mAllChar[2]=new CharacterP();
+        mAllChar[3]=new CharacterE();
+        mAllChar[4]=new CharacterR();
+        mAllChar[5]=new CharacterI();
+        mAllChar[6]=new CharacterA();
+        mAllChar[7]=new CharacterL();
+
+        for (CharacterBase c: mAllChar) {
+            totalWidth += c.getWidth();
+        }
+
     }
     public static void checkGlError(String glOperation) {
         int error;
@@ -41,7 +57,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES32.glViewport(0, 0, width, height);
         float ratio = (float) width / height;
         float left=-ratio,right=ratio;
-        Matrix.frustumM(mProjectionMatrix, 0, left,right, -1.0f, 1.0f, 1.0f, 8.0f);
+        Matrix.frustumM(mProjectionMatrix, 0, left,right, -1.0f, 1.0f, 1.0f, 50.0f);
     }
 
     @Override
@@ -55,23 +71,29 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES32.glDepthFunc(GLES32.GL_LEQUAL);//indicate what type of depth test
         Matrix.setIdentityM(mMVPMatrix,0);//set the model view projection matrix to an identity matrix
         Matrix.setIdentityM(mMVMatrix,0);//set the model view  matrix to an identity matrix
-        Matrix.setIdentityM(mModelMatrix,0);//set the model matrix to an identity matrix
-        Matrix.setRotateM(mRotationMatrix2, 0, 30, 0f, 1f, 0);//rotate around the y-axis
-        Matrix.setRotateM(mRotationMatrix, 0, 30, 1f, 0f, 0);//rotate around the x-axis
+//        Matrix.setIdentityM(mModelMatrix,0);//set the model matrix to an identity matrix
+//        Matrix.setRotateM(mRotationMatrix2, 0, 30, 0f, 1f, 0);//rotate around the y-axis
+//        Matrix.setRotateM(mRotationMatrix, 0, 30, 1f, 0f, 0);//rotate around the x-axis
         // Set the camera position (View matrix)
         Matrix.setLookAtM(mViewMatrix, 0,
                 0.0f, 0f, 1.0f,//camera is at (0,0,1)
                 0f, 0f, 0f,//looks at the origin
                 0f, 1f, 0.0f);//head is down (set to (0,1,0) to look from the top)
-        Matrix.translateM(mModelMatrix,0,0.0f,0.0f,-5f);//move backward for 5 units
-        Matrix.multiplyMM(mModelMatrix, 0, mModelMatrix, 0, mRotationMatrix, 0);
-        Matrix.multiplyMM(mModelMatrix, 0, mModelMatrix, 0, mRotationMatrix2, 0);
-        // Calculate the projection and view transformation
-        //calculate the model view matrix
-        Matrix.multiplyMM(mMVMatrix,0,mViewMatrix,0,mModelMatrix,0);
-        Matrix.multiplyMM(mMVPMatrix,0,mProjectionMatrix,0,mMVMatrix,0);
 
-        mcharA.draw(mMVPMatrix);
+        float space = 2;
+        float currentX = -totalWidth/2 - space * mAllChar.length;
+
+        for (CharacterBase c: mAllChar) {
+            currentX += c.getWidth() / 2 + space * .5f;
+            Matrix.setIdentityM(mModelMatrix, 0);//set the model matrix to an identity matrix
+            Matrix.translateM(mModelMatrix, 0, currentX, 0.0f, -25f);//move backward for 5 units
+            // Calculate the projection and view transformation
+            //calculate the model view matrix
+            Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+            Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+
+            c.draw(mMVPMatrix);
+            currentX += c.getWidth() / 2 + space * .5f;
+        }
     }
-
 }
