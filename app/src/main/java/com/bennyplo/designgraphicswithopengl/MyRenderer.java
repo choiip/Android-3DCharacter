@@ -57,13 +57,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES32.glViewport(0, 0, width, height);
         float ratio = (float) width / height;
         float left=-ratio,right=ratio;
-        Matrix.frustumM(mProjectionMatrix, 0, left,right, -1.0f, 1.0f, 1.0f, 50.0f);
+        Matrix.frustumM(mProjectionMatrix, 0, left,right, -1.0f, 1.0f, 1.0f, 500.0f);
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        float[] mRotationMatrix = new float[16];
-        float[] mRotationMatrix2 = new float[16];
         // Draw background color
         GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
         GLES32.glClearDepthf(1.0f);//set up the depth buffer
@@ -71,9 +69,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES32.glDepthFunc(GLES32.GL_LEQUAL);//indicate what type of depth test
         Matrix.setIdentityM(mMVPMatrix,0);//set the model view projection matrix to an identity matrix
         Matrix.setIdentityM(mMVMatrix,0);//set the model view  matrix to an identity matrix
-//        Matrix.setIdentityM(mModelMatrix,0);//set the model matrix to an identity matrix
-        Matrix.setRotateM(mRotationMatrix2, 0, mAngle, 0f, 1f, 0);//rotate around the y-axis
-//        Matrix.setRotateM(mRotationMatrix, 0, 30, 1f, 0f, 0);//rotate around the x-axis
         // Set the camera position (View matrix)
         Matrix.setLookAtM(mViewMatrix, 0,
                 0.0f, 0f, 1.0f,//camera is at (0,0,1)
@@ -81,19 +76,24 @@ public class MyRenderer implements GLSurfaceView.Renderer {
                 0f, 1f, 0.0f);//head is down (set to (0,1,0) to look from the top)
 
         float space = 2;
-        float currentX = -totalWidth/2 - space * mAllChar.length;
+        float currentX = -totalWidth/2 - space/2 * mAllChar.length;
         float currentAngle = mAngle;
 
         for (CharacterBase c: mAllChar) {
             currentX += c.getWidth() / 2 + space * .5f;
             Matrix.setIdentityM(mModelMatrix, 0);//set the model matrix to an identity matrix
-            Matrix.translateM(mModelMatrix, 0, currentX, 0.0f, -25f);//move backward for 5 units
-//            Matrix.multiplyMM(mModelMatrix, 0, mModelMatrix, 0, mRotationMatrix, 0);
-            Matrix.rotateM(mModelMatrix, 0, currentAngle, 0f, 1f, 0);
+            Matrix.translateM(mModelMatrix, 0, currentX, 0.0f, -50f);//move backward for 50 units
             // Calculate the projection and view transformation
             //calculate the model view matrix
             Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
             Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+            Matrix.translateM(mMVPMatrix, 0, -currentX, 0.0f, 0f);
+            if (currentAngle < 360) {
+                Matrix.rotateM(mMVPMatrix, 0, currentAngle, 0f, 1f, 0);
+            } else {
+                Matrix.rotateM(mMVPMatrix, 0, currentAngle, 1f, 0f, 1);
+            }
+            Matrix.translateM(mMVPMatrix, 0, currentX, 0.0f, 0);
 
             c.draw(mMVPMatrix);
             currentX += c.getWidth() / 2 + space * .5f;
@@ -101,6 +101,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     }
 
     public void update() {
-        mAngle += 2;
+        mAngle += 5;
+        if (mAngle > 720.f) {
+            mAngle -= 720;
+        }
     }
 }
