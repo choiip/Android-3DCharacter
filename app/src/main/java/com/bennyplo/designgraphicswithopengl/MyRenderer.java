@@ -22,15 +22,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         // Set the background frame color to black
         GLES32.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        mAllChar = new CharacterBase[8];
-        mAllChar[0]=new CharacterI();
-        mAllChar[1]=new CharacterM();
-        mAllChar[2]=new CharacterP();
-        mAllChar[3]=new CharacterE();
-        mAllChar[4]=new CharacterR();
-        mAllChar[5]=new CharacterI();
-        mAllChar[6]=new CharacterA();
-        mAllChar[7]=new CharacterL();
+        mAllChar = new CharacterBase[6];
+        mAllChar[0]=new CharacterC();
+        mAllChar[1]=new CharacterH();
+        mAllChar[2]=new CharacterO();
+        mAllChar[3]=new CharacterI();
+        mAllChar[4]=new CharacterI();
+        mAllChar[5]=new CharacterP();
 
         for (CharacterBase c: mAllChar) {
             totalWidth += c.getWidth();
