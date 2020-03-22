@@ -93,6 +93,7 @@ public class CharacterM extends CharacterBase {
                 15,22,23,23,24,25,
                 23,25,13,
         };
-        return i;
+        int gi[] = generateIndex(0, 12, 13);
+        return Util.join(i, gi);
     }
 }

@@ -15,7 +15,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private final float[] mMVMatrix=new float[16];//model view matrix
     private final float[] mModelMatrix=new float[16];//model  matrix
     private CharacterBase mAllChar[];
-
+    private float mAngle = 0;
     private float totalWidth = 0;
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -72,7 +72,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(mMVPMatrix,0);//set the model view projection matrix to an identity matrix
         Matrix.setIdentityM(mMVMatrix,0);//set the model view  matrix to an identity matrix
 //        Matrix.setIdentityM(mModelMatrix,0);//set the model matrix to an identity matrix
-//        Matrix.setRotateM(mRotationMatrix2, 0, 30, 0f, 1f, 0);//rotate around the y-axis
+        Matrix.setRotateM(mRotationMatrix2, 0, mAngle, 0f, 1f, 0);//rotate around the y-axis
 //        Matrix.setRotateM(mRotationMatrix, 0, 30, 1f, 0f, 0);//rotate around the x-axis
         // Set the camera position (View matrix)
         Matrix.setLookAtM(mViewMatrix, 0,
@@ -82,11 +82,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
         float space = 2;
         float currentX = -totalWidth/2 - space * mAllChar.length;
+        float currentAngle = mAngle;
 
         for (CharacterBase c: mAllChar) {
             currentX += c.getWidth() / 2 + space * .5f;
             Matrix.setIdentityM(mModelMatrix, 0);//set the model matrix to an identity matrix
             Matrix.translateM(mModelMatrix, 0, currentX, 0.0f, -25f);//move backward for 5 units
+//            Matrix.multiplyMM(mModelMatrix, 0, mModelMatrix, 0, mRotationMatrix, 0);
+            Matrix.rotateM(mModelMatrix, 0, currentAngle, 0f, 1f, 0);
             // Calculate the projection and view transformation
             //calculate the model view matrix
             Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
@@ -95,5 +98,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
             c.draw(mMVPMatrix);
             currentX += c.getWidth() / 2 + space * .5f;
         }
+    }
+
+    public void update() {
+        mAngle += 2;
     }
 }

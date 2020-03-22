@@ -9,130 +9,133 @@ public class CharacterP extends CharacterBase {
     private final double BEGIN_ANGLE = 270 * PI / 180;
     private final double END_ANGLE = 450 * PI / 180;
 
-    Curve curve = null;
+    float []vertex = null;
+    float []color = null;
+    int []index = null;
+
     public CharacterP(){
         super();
     }
 
-    private void createCurve(int indexOffset) {
-        curve = new Curve();
-        float[]innerVertex = Util.createEllipseArc(1,1, 1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
-        float[]outerVertex = Util.createEllipseArc(3,3, 1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
-        float[]backInnerVertex = Util.createEllipseArc(1,1, -1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
-        float[]backOuterVertex = Util.createEllipseArc(3,3, -1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
-        float[]frontVertex = Util.join(innerVertex, outerVertex);
-        float[]backVertex = Util.join(backInnerVertex, backOuterVertex);
-        curve.vertex = Util.join(frontVertex, backVertex);
-        // offset the vertex
-        int vertexCount = curve.vertex.length / 3;
-        int halfVertexCount = vertexCount / 2;
-        for (int i=0; i<vertexCount; i++) {
-            curve.vertex[3*i] += 1;     // x
-            curve.vertex[3*i+1] += 2;   // y
-        }
-
-        curve.color = new float[vertexCount * 4];
-        Arrays.fill(curve.color, 1.0f);
-        for (int i=vertexCount*2; i < curve.color.length; i+=4) {
-            curve.color[i] = 0.f;
-            curve.color[i+1] = 0.f;
-        }
-        curve.index = new int[3*(vertexCount -4)];
-        for (int i=0, currentIndex = 0; i<curve.index.length/2; i+=6, currentIndex++) {
-            curve.index[i + 0] = indexOffset + currentIndex;
-            curve.index[i + 1] = indexOffset + currentIndex + halfVertexCount / 2;
-            curve.index[i + 2] = indexOffset + currentIndex + halfVertexCount / 2 + 1;
-            curve.index[i + 3] = indexOffset + currentIndex;
-            curve.index[i + 4] = indexOffset + currentIndex + 1;
-            curve.index[i + 5] = indexOffset + currentIndex + halfVertexCount / 2 + 1;
-        }
-
-        for (int i=curve.index.length/2, currentIndex=halfVertexCount; i<curve.index.length; i+=6, currentIndex++) {
-            curve.index[i + 0] = indexOffset + currentIndex;
-            curve.index[i + 1] = indexOffset + currentIndex + halfVertexCount / 2;
-            curve.index[i + 2] = indexOffset + currentIndex + halfVertexCount / 2 + 1;
-            curve.index[i + 3] = indexOffset + currentIndex;
-            curve.index[i + 4] = indexOffset + currentIndex + 1;
-            curve.index[i + 5] = indexOffset + currentIndex + halfVertexCount / 2 + 1;
-        }
-    }
-
     float[] getCharVertex() {
-        if (curve == null) {
-            createCurve(20);
+        if (vertex == null) {
+            float vsf[] = {
+                    -4, 5, 1,
+                    1, 5, 1,
+                    1, 3, 1,
+                    -1, 3, 1,
+                    -1, 1, 1,
+                    1, 1, 1,
+                    1, -1, 1,
+                    -1, -1, 1,
+                    -1, -5, 1,
+                    -4, -5, 1,
+            };
+            float vsb[] = {
+                    -4, 5, -1,
+                    1, 5, -1,
+                    1, 3, -1,
+                    -1, 3, -1,
+                    -1, 1, -1,
+                    1, 1, -1,
+                    1, -1, -1,
+                    -1, -1, -1,
+                    -1, -5, -1,
+                    -4, -5, -1,
+            };
+            float[] innerVertex = Util.createEllipseArc(1, 1, 1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
+            float[] outerVertex = Util.createEllipseArc(3, 3, 1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
+            float[] vcf = Util.join(innerVertex, outerVertex);
+            for (int i=0; i<vcf.length; i+=3) {
+                vcf[i] += 1;     // x
+                vcf[i+1] += 2;   // y
+            }
+            float[] vf = Util.join(vsf, vcf);
+
+            float[] backInnerVertex = Util.createEllipseArc(1, 1, -1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
+            float[] backOuterVertex = Util.createEllipseArc(3, 3, -1, BEGIN_ANGLE, END_ANGLE, RESOLUTION);
+            float[] vcb = Util.join(backInnerVertex, backOuterVertex);
+            for (int i=0; i<vcb.length; i+=3) {
+                vcb[i] += 1;     // x
+                vcb[i+1] += 2;   // y
+            }
+            float[] vb = Util.join(vsb, vcb);
+
+            vertex = Util.join(vf, vb);
         }
-        float v[] ={
-                -4,5,1,
-                1,5,1,
-                1,3,1,
-                -1,3,1,
-                -1,1,1,
-                1,1,1,
-                1,-1,1,
-                -1,-1,1,
-                -1,-5,1,
-                -4,-5,1,
-
-                -4,5,-1,
-                1,5,-1,
-                1,3,-1,
-                -1,3,-1,
-                -1,1,-1,
-                1,1,-1,
-                1,-1,-1,
-                -1,-1,-1,
-                -1,-5,-1,
-                -4,-5,-1,
-        };
-
-        return Util.join(v, curve.vertex);
+        return vertex;
     }
 
     float[] getCharColor() {
-        if (curve == null) {
-            createCurve(20);
+        if (color == null) {
+            int vertexCount = vertex.length / 3;
+            float[] cf = new float[vertexCount * 2];
+            float[] cb = new float[vertexCount * 2];
+            Arrays.fill(cf, 1);
+            Arrays.fill(cb, 1);
+            for (int i=0; i<cb.length; i+=4) {
+                cb[i] = 0;
+                cb[i+1] = 0;
+            }
+            color = Util.join(cf, cb);
         }
-        float c[]={
-                1.0f,1.0f,1.0f,1.0f,//0
-                1.0f,1.0f,1.0f,1.0f,//1
-                1.0f,1.0f,1.0f,1.0f,//2
-                1.0f,1.0f,1.0f,1.0f,//3
-                1.0f,1.0f,1.0f,1.0f,//4
-                1.0f,1.0f,1.0f,1.0f,//5
-                1.0f,1.0f,1.0f,1.0f,//6
-                1.0f,1.0f,1.0f,1.0f,//7
-                1.0f,1.0f,1.0f,1.0f,//8
-                1.0f,1.0f,1.0f,1.0f,//9
-
-                0.0f,0.0f,1.0f,1.0f,//10
-                0.0f,0.0f,1.0f,1.0f,//11
-                0.0f,0.0f,1.0f,1.0f,//12
-                0.0f,0.0f,1.0f,1.0f,//13
-                0.0f,0.0f,1.0f,1.0f,//14
-                0.0f,0.0f,1.0f,1.0f,//15
-                0.0f,0.0f,1.0f,1.0f,//16
-                0.0f,0.0f,1.0f,1.0f,//17
-                0.0f,0.0f,1.0f,1.0f,//18
-                0.0f,0.0f,1.0f,1.0f,//19
-        };
-        return Util.join(c, curve.color);
+        return color;
     }
 
     int[] getCharIndex() {
-        if (curve == null) {
-            createCurve(20);
-        }
-        int i[]={
-                0,1,3,1,2,3,
-                0,3,4,0,4,9,
-                4,5,6,4,6,7,
-                4,7,9,7,8,9,
+        if (index == null) {
+            int i_f[] = {
+                    0, 1, 3, 1, 2, 3,
+                    0, 3, 4, 0, 4, 9,
+                    4, 5, 6, 4, 6, 7,
+                    4, 7, 9, 7, 8, 9,
+            };
+            int i_b[] = {
+                    10, 11, 13, 11, 12, 13,
+                    10, 13, 14, 10, 14, 19,
+                    14, 15, 16, 14, 16, 17,
+                    14, 17, 19, 17, 18, 19,
+            };
+            int indexOffset = 10;
+            int vertexCount = vertex.length / 3;
+            int cvertexCount = vertexCount - (indexOffset*2);
+            int halfCvertexCount = cvertexCount / 2;
+            int[] icf = new int[3*(cvertexCount -4)/2];
+            for (int i=0, currentIndex = indexOffset; i<icf.length-1; i+=6, currentIndex++) {
+                icf[i + 0] = currentIndex;
+                icf[i + 1] = currentIndex + halfCvertexCount / 2;
+                icf[i + 2] = currentIndex + halfCvertexCount / 2 + 1;
+                icf[i + 3] = currentIndex;
+                icf[i + 4] = currentIndex + 1;
+                icf[i + 5] = currentIndex + halfCvertexCount / 2 + 1;
+            }
 
-                10,11,13,11,12,13,
-                10,13,14,10,14,19,
-                14,15,16,14,16,17,
-                14,17,19,17,18,19,
-        };
-        return Util.join(i, curve.index);
+            int[] icb = new int[3*(cvertexCount -4)/2];
+            for (int i=0, currentIndex=indexOffset+halfCvertexCount+indexOffset; i<icb.length-1; i+=6, currentIndex++) {
+                icb[i + 0] = currentIndex;
+                icb[i + 1] = currentIndex + halfCvertexCount / 2;
+                icb[i + 2] = currentIndex + halfCvertexCount / 2 + 1;
+                icb[i + 3] = currentIndex;
+                icb[i + 4] = currentIndex + 1;
+                icb[i + 5] = currentIndex + halfCvertexCount / 2 + 1;
+            }
+            int[] front = Util.join(i_f, icf);
+
+            for (int i=0; i<i_b.length; i++) {
+                i_b[i] += halfCvertexCount;
+            }
+
+            int[] back = Util.join(i_b, icb);
+            int[] frontback = Util.join(front, back);
+
+            int gi1[] = generateIndex(0, 9, vertexCount / 2, true);
+            int gi2[] = generateIndex(10, vertexCount / 4 + 3, vertexCount / 2);
+            int gi3[] = generateIndex(vertexCount / 4 + 4 + 1, vertexCount / 2 - 2, vertexCount / 2);
+
+            int gi[] = Util.join(gi1, gi2);
+            gi = Util.join(gi, gi3);
+            index = Util.join(frontback, gi);
+        }
+        return index;
     }
 }

@@ -43,8 +43,10 @@ public class CharacterI extends CharacterBase {
     int[] getCharIndex() {
         int i[]={
                 0,1,2,0,2,3,
+
                 4,5,6,4,6,7,
         };
-        return i;
+        int gi[] = generateIndex(0, 3, 4);
+        return Util.join(i, gi);
     }
 }

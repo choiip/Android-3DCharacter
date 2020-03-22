@@ -37,13 +37,16 @@ public final class Util {
         for (double t = beginAngle; t < endAngle; t += 1.0/resolution) { // <- or different step
             count++;
         }
-        float[] vertex = new float[count*3];
+        float[] vertex = new float[(count+1)*3];
         for (double t = beginAngle; t < endAngle; t += 1.0/resolution) { // <- or different step
-            vertex[3*i+0] = ((float)(rx * Math.cos(t))); // x
-            vertex[3*i+1] = ((float)(ry * Math.sin(t))); // y
-            vertex[3*i+2] = z;    // z
-            i++;
+            vertex[i+0] = ((float)(rx * Math.cos(t))); // x
+            vertex[i+1] = ((float)(ry * Math.sin(t))); // y
+            vertex[i+2] = z;    // z
+            i+=3;
         }
+        vertex[i] = ((float)(rx * Math.cos(endAngle))); // x
+        vertex[i+1] = ((float)(ry * Math.sin(endAngle))); // y
+        vertex[i+2] = z;    // z
 
         return vertex;
     }

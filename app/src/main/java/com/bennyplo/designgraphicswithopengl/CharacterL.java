@@ -51,6 +51,7 @@ public class CharacterL extends CharacterBase {
                 6,7,8,6,8,11,
                 8,10,11,8,9,10,
         };
-        return i;
+        int gi[] = generateIndex(0, 5, 6);
+        return Util.join(i, gi);
     }
 }

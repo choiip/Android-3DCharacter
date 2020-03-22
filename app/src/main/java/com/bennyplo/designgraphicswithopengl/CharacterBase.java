@@ -111,6 +111,33 @@ public abstract class CharacterBase {
 
     public float getWidth() { return 8; }
 
+    protected int[] generateIndex(int beginIndex, int endIndex, int frontBackOffset) {
+        return generateIndex(beginIndex, endIndex, frontBackOffset, false);
+    }
+
+    protected int[] generateIndex(int beginIndex, int endIndex, int frontBackOffset, boolean lastToZero) {
+        int[] index = new int[6*(endIndex - beginIndex + 1)];
+        int currentIndex = beginIndex;
+        for (int i=0; i<index.length; i+=6, currentIndex++) {
+            index[i] = currentIndex;
+            index[i+1] = (currentIndex+1)%frontBackOffset;
+            index[i+2] = (currentIndex+1)%frontBackOffset + frontBackOffset;
+            index[i+3] = index[i];
+            index[i+4] = index[i+2];
+            index[i+5] = (currentIndex+frontBackOffset);
+        }
+        if (lastToZero) {
+            int i = index.length - 6;
+            index[i] = endIndex;
+            index[i+1] = 0;
+            index[i+2] = frontBackOffset;
+            index[i+3] = index[i];
+            index[i+4] = index[i+2];
+            index[i+5] = (endIndex+frontBackOffset);
+        }
+        return index;
+    }
+
     abstract float[] getCharVertex();
 
     abstract float[] getCharColor();
