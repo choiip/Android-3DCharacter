@@ -9,6 +9,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
+    private final static boolean SHOW_MY_LOGO = true;
     private final float[] mMVPMatrix = new float[16];//model view projection matrix
     private final float[] mProjectionMatrix = new float[16];//projection mastrix
     private final float[] mViewMatrix = new float[16];//view matrix
@@ -22,13 +23,25 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         // Set the background frame color to black
         GLES32.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        mAllChar = new CharacterBase[6];
-        mAllChar[0]=new CharacterC();
-        mAllChar[1]=new CharacterH();
-        mAllChar[2]=new CharacterO();
-        mAllChar[3]=new CharacterI();
-        mAllChar[4]=new CharacterI();
-        mAllChar[5]=new CharacterP();
+        if (SHOW_MY_LOGO) {
+            mAllChar = new CharacterBase[6];
+            mAllChar[0] = new CharacterC();
+            mAllChar[1] = new CharacterH();
+            mAllChar[2] = new CharacterO();
+            mAllChar[3] = new CharacterI();
+            mAllChar[4] = new CharacterI();
+            mAllChar[5] = new CharacterP();
+        } else {
+            mAllChar = new CharacterBase[8];
+            mAllChar[0]=new CharacterI();
+            mAllChar[1]=new CharacterM();
+            mAllChar[2]=new CharacterP();
+            mAllChar[3]=new CharacterE();
+            mAllChar[4]=new CharacterR();
+            mAllChar[5]=new CharacterI();
+            mAllChar[6]=new CharacterA();
+            mAllChar[7]=new CharacterL();
+        }
 
         for (CharacterBase c: mAllChar) {
             totalWidth += c.getWidth();
